@@ -33,7 +33,7 @@
                 </form>
             </div>
             <div class="flex">
-                <div class="w-1/4">
+                <div class="w-1/4 border-b border-gray-200">
                     @include('layouts.sidebar')
                 </div>
                 <main class="py-4">
