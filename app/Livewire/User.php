@@ -12,8 +12,37 @@ class User extends Component
     public $email;
     public $role;
     public $password;
+    public $selected;
+    public $showModal = false;
 
-    public function store(){
+    public function preEdit($id)
+    {
+        $this->selected = UserModels::findOrFail($id);
+        $this->username = $this->selected->name;
+        $this->email = $this->selected->email;
+        $this->role = $this->selected->role;
+        $this->status = 'edit';
+    }
+
+    public function preDelete($id)
+    {
+        $this->selected = UserModels::findOrFail($id);
+        $this->showModal = true; // Show the confirmation modal
+    }
+
+    public function delete()
+    {
+        if ($this->selected) {
+            $this->selected->delete();
+            session()->flash('message', 'User deleted successfully.');
+        }
+
+        $this->showModal = false;
+        $this->status = 'index';
+    }
+
+    public function store()
+    {
         $this->validate([
             'username' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -29,7 +58,7 @@ class User extends Component
         ]);
 
         $store = new UserModels;
-        
+
         $store->fill([
             'name' => $this->username,
             'email' => $this->email,
@@ -39,7 +68,6 @@ class User extends Component
         $store->save();
 
         $this->reset(['username', 'email', 'role', 'password']);
-
         $this->status = 'index';
     }
 
@@ -47,10 +75,9 @@ class User extends Component
     {
         $this->status = $newStatus;
     }
-    
+
     public function render()
     {
         return view('livewire.user')->with('users', UserModels::all());
-        
     }
 }
